@@ -1,6 +1,6 @@
 {
   "name": "@esimfly/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for the eSIMfly Business API — let Claude, ChatGPT, Cursor and other AI agents search eSIM plans, check usage, diagnose connectivity and (optionally) place orders",
   "keywords": [
     "mcp",
@@ -71,5 +71,5 @@
   "overrides": {
     "esbuild": ">=0.28.1"
   },
-  "mcpName": "io.github.esimfly-official/esimfly-mcp"
+  "mcpName": "io.github.eSimfly-Official/esimfly-mcp"
 }

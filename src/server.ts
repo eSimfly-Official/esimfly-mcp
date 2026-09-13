@@ -12,7 +12,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { ESIMfly, ESIMflyError, type ESIMflyConfig, type Package } from '@esimfly/sdk';
 
-export const MCP_VERSION = '0.1.0';
+export const MCP_VERSION = '0.1.1';
 const FULL_PROMPT_URL = 'https://docs.esimfly.net/llm/esimfly-api-full-prompt.txt';
 const DOCS_URL = 'https://docs.esimfly.net';
 

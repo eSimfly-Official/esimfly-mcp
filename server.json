@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
-  "name": "io.github.esimfly-official/esimfly-mcp",
+  "name": "io.github.eSimfly-Official/esimfly-mcp",
   "description": "eSIMfly Business API: search eSIM plans, check usage, diagnose eSIMs, optionally order (confirmed)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "websiteUrl": "https://docs.esimfly.net",
   "repository": {
     "url": "https://github.com/eSimfly-Official/esimfly-mcp",
@@ -13,7 +13,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@esimfly/mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },
