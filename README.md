@@ -1,5 +1,7 @@
 # @esimfly/mcp — eSIMfly MCP server
 
+[![eSimfly-Official/esimfly-mcp MCP server](https://glama.ai/mcp/servers/eSimfly-Official/esimfly-mcp/badges/score.svg)](https://glama.ai/mcp/servers/eSimfly-Official/esimfly-mcp) [![npm](https://img.shields.io/npm/v/%40esimfly%2Fmcp)](https://www.npmjs.com/package/@esimfly/mcp) [![CI](https://github.com/eSimfly-Official/esimfly-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/eSimfly-Official/esimfly-mcp/actions/workflows/ci.yml)
+
 Give your AI assistant hands on the eSIMfly Business API. With this
 [Model Context Protocol](https://modelcontextprotocol.io) server, Claude, Cursor, ChatGPT and other
 MCP clients can search eSIM plans with your wholesale prices, check balances and usage, diagnose
