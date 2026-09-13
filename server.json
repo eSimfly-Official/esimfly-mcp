@@ -1,22 +1,42 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "io.github.esimfly-official/esimfly-mcp",
-  "description": "eSIMfly Business API: search eSIM plans with wholesale prices, check usage, diagnose connectivity, and optionally order and top up eSIMs (two-step confirmation).",
+  "description": "eSIMfly Business API: search eSIM plans, check usage, diagnose eSIMs, optionally order (confirmed)",
   "version": "0.1.0",
   "websiteUrl": "https://docs.esimfly.net",
-  "repository": { "url": "https://github.com/eSimfly-Official/esimfly-mcp", "source": "github" },
+  "repository": {
+    "url": "https://github.com/eSimfly-Official/esimfly-mcp",
+    "source": "github"
+  },
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@esimfly/mcp",
       "version": "0.1.0",
-      "transport": { "type": "stdio" },
+      "transport": {
+        "type": "stdio"
+      },
       "runtimeHint": "npx",
       "environmentVariables": [
-        { "name": "ESIMFLY_ACCESS_CODE", "description": "eSIMfly API access code (esf_...)", "isRequired": true, "isSecret": true },
-        { "name": "ESIMFLY_SECRET_KEY", "description": "eSIMfly API secret key (sk_...)", "isRequired": true, "isSecret": true },
-        { "name": "ESIMFLY_MCP_ALLOW_WRITES", "description": "Set to true to enable ordering, top-up, cancel, suspend, SMS and webhook tools", "isRequired": false, "isSecret": false }
+        {
+          "name": "ESIMFLY_ACCESS_CODE",
+          "description": "eSIMfly API access code (esf_...)",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "ESIMFLY_SECRET_KEY",
+          "description": "eSIMfly API secret key (sk_...)",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "ESIMFLY_MCP_ALLOW_WRITES",
+          "description": "Set to true to enable ordering, top-up, cancel, suspend, SMS and webhook tools",
+          "isRequired": false,
+          "isSecret": false
+        }
       ]
     }
   ]
