@@ -16,7 +16,7 @@
   "homepage": "https://docs.esimfly.net",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eSimfly-Official/esimfly-mcp.git"
+    "url": "git+https://github.com/eSimfly-Official/esimfly-mcp.git"
   },
   "bugs": {
     "email": "support@esimfly.net"
@@ -25,7 +25,7 @@
   "author": "eSIMfly <support@esimfly.net>",
   "type": "module",
   "bin": {
-    "esimfly-mcp": "./dist/index.js"
+    "esimfly-mcp": "dist/index.js"
   },
   "main": "./dist/server.js",
   "types": "./dist/server.d.ts",
