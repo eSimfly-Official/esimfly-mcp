@@ -1,0 +1,75 @@
+{
+  "name": "@esimfly/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the eSIMfly Business API — let Claude, ChatGPT, Cursor and other AI agents search eSIM plans, check usage, diagnose connectivity and (optionally) place orders",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "esim",
+    "esimfly",
+    "ai-agent",
+    "claude",
+    "cursor",
+    "travel",
+    "connectivity"
+  ],
+  "homepage": "https://docs.esimfly.net",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eSimfly-Official/esimfly-mcp.git"
+  },
+  "bugs": {
+    "email": "support@esimfly.net"
+  },
+  "license": "MIT",
+  "author": "eSIMfly <support@esimfly.net>",
+  "type": "module",
+  "bin": {
+    "esimfly-mcp": "./dist/index.js"
+  },
+  "main": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "server.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@esimfly/sdk": "^0.1.0",
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "esbuild": ">=0.28.1"
+  },
+  "mcpName": "io.github.esimfly-official/esimfly-mcp"
+}
