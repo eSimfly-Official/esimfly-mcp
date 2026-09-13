@@ -58,6 +58,13 @@ claude mcp add esimfly -e ESIMFLY_ACCESS_CODE=esf_... -e ESIMFLY_SECRET_KEY=sk_.
 }
 ```
 
+### Docker
+
+```bash
+docker build -t esimfly-mcp .
+docker run -i --rm -e ESIMFLY_ACCESS_CODE=esf_... -e ESIMFLY_SECRET_KEY=sk_... esimfly-mcp
+```
+
 ### Enable write tools
 
 Add `"ESIMFLY_MCP_ALLOW_WRITES": "true"` to `env`. Without it the ordering, top-up, cancel,
