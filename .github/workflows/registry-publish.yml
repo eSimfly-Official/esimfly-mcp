@@ -28,4 +28,13 @@ jobs:
           echo "npm does not serve @esimfly/mcp@$V yet" >&2; exit 1
       - run: mcp-publisher login github-oidc
       - run: mcp-publisher validate
-      - run: mcp-publisher publish
+      - name: Publish (skipped when this version is already in the registry)
+        run: |
+          NAME=$(node -p "require('./server.json').name")
+          V=$(node -p "require('./server.json').version")
+          if curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=$(node -p "encodeURIComponent('$NAME'.split('/')[1])")" \
+             | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);process.exit((j.servers||[]).some(s=>(s.server||s).name==='$NAME'&&(s.server||s).version==='$V')?0:1)})"; then
+            echo "$NAME $V is already published — nothing to do"
+          else
+            mcp-publisher publish
+          fi
