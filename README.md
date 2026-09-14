@@ -15,7 +15,14 @@ explicit confirmation step.
 
 Docs: **https://docs.esimfly.net** · Credentials: Business Dashboard → Settings → API Keys.
 
-## Install
+## Hosted server (no install)
+
+Prefer not to run anything locally? eSIMfly hosts this same server at **`https://mcp.esimfly.net/mcp`**.
+Add it as a remote MCP server in Claude.ai, ChatGPT, Claude Code (`claude mcp add --transport http esimfly https://mcp.esimfly.net/mcp`),
+Cursor or VS Code and sign in with your eSIMfly business account — OAuth 2.1, no keys to paste, write
+tools opt-in on the consent screen. Details: https://docs.esimfly.net/docs/mcp-server
+
+## Local install
 
 The server runs locally over stdio; your API key never leaves your machine.
 
