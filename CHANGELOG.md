@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 — 2026-09-14
+
+Server metadata for directories and clients: title, description, website and icons in the MCP handshake (`serverInfo`).
+
 ## 0.1.2 — 2026-09-14
 
 Hosted endpoint published: https://mcp.esimfly.net/mcp (OAuth 2.1, same tools). Registry entry now lists the remote alongside the npm package. No code changes.

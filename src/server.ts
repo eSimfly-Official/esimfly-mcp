@@ -12,7 +12,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { ESIMfly, ESIMflyError, type ESIMflyConfig, type Package } from '@esimfly/sdk';
 
-export const MCP_VERSION = '0.1.2';
+export const MCP_VERSION = '0.1.3';
 const FULL_PROMPT_URL = 'https://docs.esimfly.net/llm/esimfly-api-full-prompt.txt';
 const DOCS_URL = 'https://docs.esimfly.net';
 
@@ -84,7 +84,17 @@ export function createEsimflyMcpServer(options: EsimflyMcpOptions = {}): McpServ
   const fetchImpl = options.fetch ?? globalThis.fetch;
 
   const server = new McpServer(
-    { name: 'esimfly', version: MCP_VERSION },
+    {
+      name: 'esimfly',
+      version: MCP_VERSION,
+      title: 'eSIMfly',
+      description: 'Wholesale eSIM data plans for 200+ countries: search plans with your prices, check balance and usage, diagnose eSIM connectivity, and (opt-in) order and top up.',
+      websiteUrl: 'https://esimfly.net/esim-api',
+      icons: [
+        { src: 'https://esimfly.net/images/logo-blue.svg', mimeType: 'image/svg+xml', sizes: ['any'] },
+        { src: 'https://esimfly.net/images/logo.png', mimeType: 'image/png' },
+      ],
+    },
     {
       instructions: [
         'Tools for the eSIMfly Business API (wholesale eSIM data plans for 200+ countries).',
