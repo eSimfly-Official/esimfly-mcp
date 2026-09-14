@@ -1,0 +1,31 @@
+name: Publish to MCP Registry
+# Publishes server.json to the official MCP Registry using GitHub Actions OIDC —
+# no personal token needed; running inside the eSimfly-Official org grants the
+# io.github.eSimfly-Official/* namespace. Run manually, or automatically after
+# the npm publish workflow succeeds on a release.
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Publish to npm"]
+    types: [completed]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  registry:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mcp-publisher
+        run: |
+          curl -sL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          sudo mv mcp-publisher /usr/local/bin/
+      - name: Wait until npm serves the version in server.json
+        run: |
+          V=$(node -p "require('./server.json').packages[0].version")
+          for i in $(seq 1 20); do npm view "@esimfly/mcp@$V" version >/dev/null 2>&1 && exit 0; sleep 15; done
+          echo "npm does not serve @esimfly/mcp@$V yet" >&2; exit 1
+      - run: mcp-publisher login github-oidc
+      - run: mcp-publisher validate
+      - run: mcp-publisher publish
