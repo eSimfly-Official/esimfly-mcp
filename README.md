@@ -143,7 +143,8 @@ const server = createEsimflyMcpServer({ config: { accessCode, secretKey }, allow
 
 Bump `version` in `package.json`, `server.json` and `MCP_VERSION` in `src/server.ts`, add a
 CHANGELOG entry, push, then publish a GitHub Release tagged `vX.Y.Z` — the workflow publishes to
-npm with Trusted Publishing (OIDC).
+npm with Trusted Publishing (OIDC), and the MCP Registry entry is republished
+automatically afterwards (GitHub OIDC, no tokens).
 
 ## Support
 

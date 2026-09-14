@@ -1,8 +1,8 @@
 name: Publish to MCP Registry
 # Publishes server.json to the official MCP Registry using GitHub Actions OIDC —
 # no personal token needed; running inside the eSimfly-Official org grants the
-# io.github.eSimfly-Official/* namespace. Run manually, or automatically after
-# the npm publish workflow succeeds on a release.
+# io.github.eSimfly-Official/* namespace. Runs automatically after the npm
+# publish workflow succeeds, or manually via "Run workflow".
 on:
   workflow_dispatch:
   workflow_run:
