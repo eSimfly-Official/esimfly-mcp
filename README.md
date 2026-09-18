@@ -1,6 +1,6 @@
 # @esimfly/mcp — eSIMfly MCP server
 
-[![eSimfly-Official/esimfly-mcp MCP server](https://glama.ai/mcp/servers/eSimfly-Official/esimfly-mcp/badges/score.svg)](https://glama.ai/mcp/servers/eSimfly-Official/esimfly-mcp) [![npm](https://img.shields.io/npm/v/%40esimfly%2Fmcp)](https://www.npmjs.com/package/@esimfly/mcp) [![CI](https://github.com/eSimfly-Official/esimfly-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/eSimfly-Official/esimfly-mcp/actions/workflows/ci.yml) [![smithery badge](https://smithery.ai/badge/akam19901205/esimfly)](https://smithery.ai/servers/akam19901205/esimfly)
+[![eSimfly-Official/esimfly-mcp MCP server](https://glama.ai/mcp/servers/eSimfly-Official/esimfly-mcp/badges/score.svg)](https://glama.ai/mcp/servers/eSimfly-Official/esimfly-mcp) [![npm](https://img.shields.io/npm/v/%40esimfly%2Fmcp)](https://www.npmjs.com/package/@esimfly/mcp) [![CI](https://github.com/eSimfly-Official/esimfly-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/eSimfly-Official/esimfly-mcp/actions/workflows/ci.yml) [![smithery badge](https://smithery.ai/badge/akam19901205/esimfly)](https://smithery.ai/servers/akam19901205/esimfly) [![M8ven Score](https://m8ven.ai/badge/mcp/esimfly-official/esimfly-mcp)](https://m8ven.ai/mcp/esimfly-official/esimfly-mcp)
 
 Give your AI assistant hands on the eSIMfly Business API. With this
 [Model Context Protocol](https://modelcontextprotocol.io) server, Claude, Cursor, ChatGPT and other
