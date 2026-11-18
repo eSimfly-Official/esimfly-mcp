@@ -12,7 +12,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { ESIMfly, ESIMflyError, type ESIMflyConfig, type Package } from '@esimfly/sdk';
 
-export const MCP_VERSION = '0.1.3';
+export const MCP_VERSION = '0.2.0';
 const FULL_PROMPT_URL = 'https://docs.esimfly.net/llm/esimfly-api-full-prompt.txt';
 const DOCS_URL = 'https://docs.esimfly.net';
 
@@ -73,6 +73,12 @@ function compactPackage(p: Package) {
     is_unlimited: p.is_unlimited,
     has_voice: p.has_voice ?? false,
     has_sms: p.has_sms ?? false,
+    // Allowances only where they exist: a count or 'unlimited'
+    voice_minutes: p.has_voice ? p.features?.voice_minutes ?? null : undefined,
+    sms_count: p.has_sms ? p.features?.sms_count ?? null : undefined,
+    // Phone-number lines: data_gb is the home allowance, roaming the zone allowance
+    phone_number: p.phone_number ?? undefined,
+    roaming: p.roaming ?? undefined,
     countries: p.countries ? (p.countries.length > 12 ? [...p.countries.slice(0, 12), `+${p.countries.length - 12} more`] : p.countries) : undefined,
     networks: p.networks?.length ?? p.locationNetworkList?.reduce((n, l) => n + (l.operatorList?.length ?? 0), 0),
   };
@@ -263,6 +269,17 @@ export function createEsimflyMcpServer(options: EsimflyMcpOptions = {}): McpServ
   );
 
   server.registerTool(
+    'get_topup',
+    {
+      title: 'Get top-up',
+      description: 'Status of one top-up by the orderReference that topup_esim returned. A completed top-up includes its package, amount and payment status.',
+      inputSchema: { order_reference: z.string() },
+      annotations: READ,
+    },
+    async ({ order_reference }) => run(async () => text(await client.topups.get(order_reference))),
+  );
+
+  server.registerTool(
     'get_webhook_settings',
     {
       title: 'Get webhook settings',
@@ -316,6 +333,10 @@ export function createEsimflyMcpServer(options: EsimflyMcpOptions = {}): McpServ
             amount: order.amount,
             currency: order.currency,
             newBalance: order.newBalance,
+            // Partial fill: quantity < requested_quantity, charged for quantity only
+            quantity: order.quantity,
+            requested_quantity: order.requestedQuantity,
+            note: order.note,
             esims: order.esims.map((e) => ({
               iccid: e.iccid,
               lpaString: e.lpaString,
@@ -332,11 +353,17 @@ export function createEsimflyMcpServer(options: EsimflyMcpOptions = {}): McpServ
       'topup_esim',
       {
         title: 'Top up an eSIM (spends balance)',
-        description: 'Add a package to an existing eSIM. Two-step: without confirm returns the package name, cost and current balance; with confirm: true executes.',
-        inputSchema: { iccid: iccidArg, package_code: z.string().describe('From get_topup_packages'), confirm: confirmArg },
+        description:
+          'Add a package to an existing eSIM. Two-step: first call returns the package name, cost, current balance and a generated idempotency_key; call again with confirm: true AND that idempotency_key to execute (a retry with the same key can never apply the top-up twice). Tell the user the cost before confirming.',
+        inputSchema: {
+          iccid: iccidArg,
+          package_code: z.string().describe('From get_topup_packages'),
+          idempotency_key: z.string().max(200).optional().describe('From the preview; required with confirm: true'),
+          confirm: confirmArg,
+        },
         annotations: WRITE,
       },
-      async ({ iccid, package_code, confirm }) =>
+      async ({ iccid, package_code, idempotency_key, confirm }) =>
         run(async () => {
           if (!confirm) {
             const [pkgs, balance] = await Promise.all([client.topups.packages({ iccid, limit: 100 }), client.balance.get()]);
@@ -348,10 +375,14 @@ export function createEsimflyMcpServer(options: EsimflyMcpOptions = {}): McpServ
               package: pkg ? { package_code: pkg.package_code, name: pkg.name, data_gb: pkg.data_amount_gb, validity_days: pkg.validity_days, cost: pkg.cost, currency: pkg.currency } : null,
               warning: pkg ? undefined : 'package_code is not in the top-up list for this eSIM; the call will fail',
               balance_before: balance,
-              next_step: 'Call topup_esim again with confirm: true to execute.',
+              idempotency_key: `mcp-topup-${randomUUID()}`,
+              next_step: 'Call topup_esim again with confirm: true and this idempotency_key to execute.',
             });
           }
-          return text(await client.topups.create({ iccid, packageCode: package_code }));
+          if (!idempotency_key) {
+            throw new ESIMflyError('confirm: true requires the idempotency_key returned by the preview', { code: 'MISSING_FIELDS' });
+          }
+          return text(await client.topups.create({ iccid, packageCode: package_code, idempotencyKey: idempotency_key }));
         }),
     );
 

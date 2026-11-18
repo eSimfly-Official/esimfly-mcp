@@ -26,11 +26,12 @@ function fakeClient(overrides: Record<string, unknown> = {}) {
     orders: {
       list: rec('orders.list', { orders: [] }),
       get: rec('orders.get', { orderReference: 'o1' }),
-      create: rec('orders.create', { orderReference: 'o9', status: 'completed', amount: 2.72, currency: 'USD', newBalance: 97.28, esims: [{ iccid: '1', lpaString: 'LPA:1$x$y', isPending: false }] }),
+      create: rec('orders.create', { orderReference: 'o9', status: 'completed', amount: 2.72, currency: 'USD', newBalance: 97.28, quantity: 1, requestedQuantity: 2, note: 'Only 1 of the 2 eSIMs requested could be provisioned.', esims: [{ iccid: '1', lpaString: 'LPA:1$x$y', isPending: false }] }),
     },
     topups: {
       packages: rec('topups.packages', { packages: [{ package_code: 'T1', name: 'Top 1GB', data_amount_gb: 1, validity_days: 7, cost: 2, currency: 'USD' }] }),
       create: rec('topups.create', { orderReference: 't1' }),
+      get: rec('topups.get', { orderReference: 't1', status: 'completed', packageCode: 'T1' }),
     },
     webhooks: { get: rec('webhooks.get', { webhook: null }), set: rec('webhooks.set', { webhook: { secret: 'whsec_x' } }) },
     ...overrides,
@@ -56,8 +57,8 @@ describe('read-only server', () => {
     const mcp = await connect({ client });
     const { tools } = await mcp.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
-      'get_balance', 'get_esim_live_status', 'get_esim_usage', 'get_network_events', 'get_order', 'get_topup_packages',
-      'get_usage_report', 'get_webhook_settings', 'list_esims', 'list_orders', 'search_packages',
+      'get_balance', 'get_esim_live_status', 'get_esim_usage', 'get_network_events', 'get_order', 'get_topup',
+      'get_topup_packages', 'get_usage_report', 'get_webhook_settings', 'list_esims', 'list_orders', 'search_packages',
     ]);
     expect(tools.every((t) => t.annotations?.readOnlyHint === true)).toBe(true);
     const { prompts } = await mcp.listPrompts();
@@ -70,6 +71,24 @@ describe('read-only server', () => {
     const res = jsonOf(await mcp.callTool({ name: 'search_packages', arguments: { search: 'Turkey' } }));
     expect(res.packages[0]).toMatchObject({ package_code: 'P1', cost: 2.72, currency: 'USD', networks: 2, countries: ['TR'] });
     expect(calls[0]).toContain('"limit":20');
+  });
+
+  it('search_packages shows voice/SMS allowances and roaming only where they exist', async () => {
+    const line = { ...pkg, package_code: 'L1', has_voice: true, has_sms: true, features: { voice_minutes: 'unlimited', sms_count: 'unlimited' }, roaming: { data_gb: 15, zone: 'EU' } };
+    const { client } = fakeClient({ packages: { list: async () => ({ packages: [pkg, line], pagination: { page: 1, limit: 20, total: 2, total_pages: 1 } }) } });
+    const mcp = await connect({ client });
+    const res = jsonOf(await mcp.callTool({ name: 'search_packages', arguments: {} }));
+    expect(res.packages[0]).not.toHaveProperty('voice_minutes');
+    expect(res.packages[0]).not.toHaveProperty('roaming');
+    expect(res.packages[1]).toMatchObject({ voice_minutes: 'unlimited', sms_count: 'unlimited', roaming: { data_gb: 15, zone: 'EU' } });
+  });
+
+  it('get_topup looks a top-up up by reference', async () => {
+    const { client, calls } = fakeClient();
+    const mcp = await connect({ client });
+    const res = jsonOf(await mcp.callTool({ name: 'get_topup', arguments: { order_reference: 't1' } }));
+    expect(res).toMatchObject({ orderReference: 't1', status: 'completed' });
+    expect(calls[0]).toBe('topups.get:["t1"]');
   });
 
   it('maps API errors to isError results with the code', async () => {
@@ -123,17 +142,26 @@ describe('write tools', () => {
 
     const done = jsonOf(await mcp.callTool({ name: 'create_order', arguments: { package_code: 'P1', confirm: true, idempotency_key: preview.idempotency_key } }));
     expect(done.orderReference).toBe('o9');
+    expect(done).toMatchObject({ quantity: 1, requested_quantity: 2 });
+    expect(done.note).toContain('Only 1 of the 2');
     expect(calls.find((c) => c.startsWith('orders.create'))).toContain(`"idempotencyKey":"${preview.idempotency_key}"`);
   });
 
-  it('topup_esim preview resolves the package and cost; confirm executes', async () => {
+  it('topup_esim previews with an idempotency key, refuses to confirm without it, then executes with it', async () => {
     const { client, calls } = fakeClient();
     const mcp = await connect({ client, allowWrites: true });
-    const preview = jsonOf(await mcp.callTool({ name: 'topup_esim', arguments: { iccid: '8948010010036785060', package_code: 'T1' } }));
+    const iccid = '8948010010036785060';
+    const preview = jsonOf(await mcp.callTool({ name: 'topup_esim', arguments: { iccid, package_code: 'T1' } }));
     expect(preview.package).toMatchObject({ name: 'Top 1GB', cost: 2 });
+    expect(preview.idempotency_key).toMatch(/^mcp-topup-/);
     expect(calls.some((c) => c.startsWith('topups.create'))).toBe(false);
-    await mcp.callTool({ name: 'topup_esim', arguments: { iccid: '8948010010036785060', package_code: 'T1', confirm: true } });
-    expect(calls.some((c) => c.startsWith('topups.create'))).toBe(true);
+
+    const noKey = await mcp.callTool({ name: 'topup_esim', arguments: { iccid, package_code: 'T1', confirm: true } });
+    expect(noKey.isError).toBe(true);
+    expect(calls.some((c) => c.startsWith('topups.create'))).toBe(false);
+
+    await mcp.callTool({ name: 'topup_esim', arguments: { iccid, package_code: 'T1', confirm: true, idempotency_key: preview.idempotency_key } });
+    expect(calls.find((c) => c.startsWith('topups.create'))).toContain(`"idempotencyKey":"${preview.idempotency_key}"`);
   });
 
   it('destructive tools never execute without confirm', async () => {

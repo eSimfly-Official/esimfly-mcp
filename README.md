@@ -100,9 +100,10 @@ suspend, SMS and webhook tools are not even registered.
 | `get_usage_report` | Daily usage by country and operator (up to 90 days) | read |
 | `list_orders` / `get_order` | Order history and one order with its eSIM | read |
 | `get_topup_packages` | Top-up options for one eSIM | read |
+| `get_topup` | One top-up's status by reference | read |
 | `get_webhook_settings` | Webhook URL, events, recent deliveries | read |
 | `create_order` | Buy eSIMs — preview → `confirm: true` + idempotency key | write |
-| `topup_esim` | Add data to an eSIM — preview shows package and cost | write |
+| `topup_esim` | Add data to an eSIM — preview (package, cost) → `confirm: true` + idempotency key | write |
 | `cancel_esim` | Cancel an unused eSIM and refund to balance | write (destructive) |
 | `suspend_esim` / `activate_esim` | Block / restore network access | write |
 | `send_sms` | Text the device holding the eSIM | write |
@@ -114,8 +115,8 @@ Prompts: `esimfly_integration_guide` (optional `stack`), `diagnose_esim` (`iccid
 
 - Read-only unless `ESIMFLY_MCP_ALLOW_WRITES=true`.
 - Write tools are two-step: a call without `confirm` returns a preview and makes no mutable API call;
-  `create_order` additionally requires the `idempotency_key` from its own preview, so an agent
-  cannot place the same order twice.
+  `create_order` and `topup_esim` additionally require the `idempotency_key` from their own preview,
+  so an agent cannot place the same order or apply the same top-up twice.
 - Tool annotations mark reads as `readOnlyHint` and cancel/suspend as `destructiveHint`, so hosts
   that ask for user approval on risky tools do so.
 - The server never logs credentials and never writes to stdout except the MCP protocol.

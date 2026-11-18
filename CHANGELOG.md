@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0 — 2026-11-19
+
+Built on `@esimfly/sdk` 0.2.0.
+
+- **`topup_esim` is now idempotent:** the preview returns an `idempotency_key`, and `confirm: true`
+  requires it (like `create_order`), so an agent retrying a top-up can never apply or charge it twice.
+- **New read tool `get_topup`:** a top-up's status by its `orderReference`.
+- `create_order` reports partial fills: `quantity`, `requested_quantity` and `note` (charged for
+  `quantity` only).
+- `search_packages` rows include `voice_minutes` / `sms_count` (a count or `'unlimited'`) on plans
+  with voice / SMS, and `phone_number` / `roaming` on phone-number lines.
+
 ## 0.1.3 — 2026-09-14
 
 Server metadata for directories and clients: title, description, website and icons in the MCP handshake (`serverInfo`).
